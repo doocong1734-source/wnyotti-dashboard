@@ -3,756 +3,584 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>워뇨띠 스타일 BTC 트레이딩 대시보드 - 소놀봇 💕</title>
+<title>워뇨띠 Pro 트레이딩 대시보드 v2.0</title>
 <script src="chart.umd.min.js"></script>
 <script src="chartjs-plugin-annotation.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',-apple-system,sans-serif;background:#0a0e17;color:#e6edf3;min-height:100vh}
-
-/* 레이아웃 */
-.app{display:grid;grid-template-columns:320px 1fr;min-height:100vh}
-.sidebar{background:#0d1117;border-right:1px solid #21262d;padding:20px;overflow-y:auto;max-height:100vh}
-.main{padding:20px;overflow-y:auto;max-height:100vh}
+.app{display:grid;grid-template-columns:340px 1fr;min-height:100vh}
+.sidebar{background:#0d1117;border-right:1px solid #21262d;padding:16px;overflow-y:auto;max-height:100vh}
+.main{padding:16px;overflow-y:auto;max-height:100vh}
 
 /* 사이드바 */
-.sidebar h2{font-size:16px;color:#f7931a;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.setting-group{margin-bottom:20px;background:#161b22;border:1px solid #30363d;border-radius:10px;padding:16px}
-.setting-group h3{font-size:13px;color:#8b949e;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #21262d}
-.setting-row{margin-bottom:12px}
-.setting-row label{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#c9d1d9;margin-bottom:4px}
-.setting-row label span.val{color:#58a6ff;font-weight:600;min-width:50px;text-align:right}
-.setting-row input[type="range"]{width:100%;height:6px;-webkit-appearance:none;background:#21262d;border-radius:3px;outline:none}
-.setting-row input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:#58a6ff;border-radius:50%;cursor:pointer}
-.setting-row input[type="number"]{width:100%;padding:8px 10px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px}
-.setting-row select{width:100%;padding:8px 10px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px}
+.sidebar h2{font-size:15px;color:#f7931a;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.sg{margin-bottom:14px;background:#161b22;border:1px solid #30363d;border-radius:8px;padding:12px}
+.sg h3{font-size:11px;color:#8b949e;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #21262d}
+.sr{margin-bottom:8px}
+.sr label{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#c9d1d9;margin-bottom:2px}
+.sr label .v{color:#58a6ff;font-weight:600;min-width:40px;text-align:right}
+.sr input[type="range"]{width:100%;height:5px;-webkit-appearance:none;background:#21262d;border-radius:3px;outline:none}
+.sr input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#58a6ff;border-radius:50%;cursor:pointer}
+.sr select{width:100%;padding:6px 8px;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:12px}
+.sr input[type="number"]{width:100%;padding:6px 8px;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:12px}
+.cb{display:flex;align-items:center;gap:6px;font-size:12px;color:#c9d1d9}
+.cb input{accent-color:#58a6ff}
 
-.btn-run{width:100%;padding:14px;background:linear-gradient(135deg,#f7931a,#ffcd00);color:#000;font-weight:700;font-size:15px;border:none;border-radius:10px;cursor:pointer;margin-top:10px;transition:transform .1s}
-.btn-run:hover{transform:scale(1.02)}
-.btn-run:active{transform:scale(0.98)}
-.btn-reset{width:100%;padding:10px;background:#21262d;color:#8b949e;font-size:13px;border:1px solid #30363d;border-radius:8px;cursor:pointer;margin-top:8px}
-.btn-reset:hover{background:#30363d}
+.btn{width:100%;padding:12px;font-weight:700;font-size:13px;border:none;border-radius:8px;cursor:pointer;margin-top:6px;transition:transform .1s}
+.btn:hover{transform:scale(1.02)}.btn:active{transform:scale(0.98)}
+.btn-run{background:linear-gradient(135deg,#f7931a,#ffcd00);color:#000}
+.btn-sec{background:#21262d;color:#8b949e;border:1px solid #30363d;font-weight:400;font-size:12px;margin-top:4px}
+.btn-sec:hover{background:#30363d}
 
-/* 메인 콘텐츠 */
-.header{text-align:center;padding:10px 0 20px}
-.header h1{font-size:24px;background:linear-gradient(135deg,#f7931a,#ffcd00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.header p{color:#8b949e;font-size:13px;margin-top:4px}
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px}
+.preset{padding:7px;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#c9d1d9;font-size:11px;cursor:pointer;text-align:center}
+.preset:hover{border-color:#58a6ff;color:#58a6ff}
+.preset.active{border-color:#f7931a;color:#f7931a;font-weight:600}
 
-.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
-.card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:16px;text-align:center}
-.card .label{font-size:11px;color:#8b949e;text-transform:uppercase;letter-spacing:.5px}
-.card .value{font-size:22px;font-weight:700;margin-top:6px}
-.card .sub{font-size:12px;color:#8b949e;margin-top:2px}
+/* 탭 */
+.tabs{display:flex;gap:2px;margin-bottom:12px;flex-wrap:wrap}
+.tab{padding:8px 14px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#8b949e;font-size:12px;cursor:pointer}
+.tab:hover{color:#e6edf3}.tab.active{background:#21262d;color:#f7931a;border-color:#f7931a}
+
+/* 메인 */
+.header{text-align:center;padding:8px 0 14px}
+.header h1{font-size:22px;background:linear-gradient(135deg,#f7931a,#ffcd00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{color:#8b949e;font-size:12px;margin-top:4px}
+
+.grid8{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:12px;text-align:center}
+.card .lb{font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:.5px}
+.card .vl{font-size:20px;font-weight:700;margin-top:4px}
+.card .sb{font-size:11px;color:#8b949e;margin-top:2px}
 .profit{color:#3fb950}.loss{color:#f85149}.neutral{color:#f7931a}.blue{color:#58a6ff}
 
-.chart-box{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:16px;margin-bottom:16px}
-.chart-box h2{font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.chart-wrap{position:relative;height:300px}
-.chart-wrap.small{height:200px}
+.box{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px;margin-bottom:12px}
+.box h2{font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cw{position:relative;height:280px}
+.cw.sm{height:180px}
+.cw.xs{height:130px}
 
-/* 거래 테이블 */
-.trades-wrap{max-height:400px;overflow-y:auto}
+.tbl-wrap{max-height:350px;overflow-y:auto}
 table{width:100%;border-collapse:collapse}
-th{background:#21262d;padding:10px 12px;text-align:left;font-size:11px;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0}
-td{padding:10px 12px;border-bottom:1px solid #161b22;font-size:13px}
-.buy-tag{background:rgba(63,185,80,.15);color:#3fb950;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
-.sell-tag{background:rgba(248,81,73,.15);color:#f85149;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+th{background:#21262d;padding:8px 10px;text-align:left;font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0;z-index:1}
+td{padding:8px 10px;border-bottom:1px solid #161b22;font-size:12px}
+.bt{background:rgba(63,185,80,.15);color:#3fb950;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.st{background:rgba(248,81,73,.15);color:#f85149;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
 
-/* 전략 설명 */
-.strategy-info{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8;color:#8b949e}
-.strategy-info strong{color:#e6edf3}
+/* 몬테카를로 */
+.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mc-stat{text-align:center;padding:10px;background:#0d1117;border-radius:6px}
+.mc-stat .mc-v{font-size:22px;font-weight:700;margin:4px 0}
+.mc-stat .mc-l{font-size:10px;color:#8b949e}
 
-.footer{text-align:center;padding:20px;color:#484f58;font-size:11px}
+/* 히트맵 */
+.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.hm-cell{padding:8px 4px;text-align:center;border-radius:4px;font-size:11px}
+.hm-header{font-size:10px;color:#8b949e;padding:4px;text-align:center}
 
-/* 로딩 */
-.loading{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,14,23,.9);display:flex;align-items:center;justify-content:center;z-index:999;font-size:18px;color:#f7931a}
+.footer{text-align:center;padding:16px;color:#484f58;font-size:10px}
+.loading{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,14,23,.92);display:flex;align-items:center;justify-content:center;z-index:999;font-size:16px;color:#f7931a;flex-direction:column;gap:8px}
 .loading.hidden{display:none}
+.loading .spinner{width:40px;height:40px;border:3px solid #21262d;border-top:3px solid #f7931a;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* 프리셋 버튼 */
-.preset-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
-.preset-btn{padding:8px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;font-size:11px;cursor:pointer;text-align:center}
-.preset-btn:hover{border-color:#58a6ff;color:#58a6ff}
-.preset-btn.active{border-color:#f7931a;color:#f7931a;font-weight:600}
-
-@media(max-width:900px){
-  .app{grid-template-columns:1fr}
-  .sidebar{max-height:none;border-right:none;border-bottom:1px solid #21262d}
-}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{max-height:none;border-right:none;border-bottom:1px solid #21262d}}
 </style>
 </head>
 <body>
-
-<div class="loading" id="loading">⏳ 백테스팅 계산 중...</div>
-
+<div class="loading" id="loading"><div class="spinner"></div>백테스팅 계산 중...</div>
 <div class="app">
-<!-- 사이드바: 지표 설정 -->
 <div class="sidebar">
-  <h2>⚙️ 전략 설정 패널</h2>
+  <h2>⚙️ Pro 전략 설정</h2>
 
-  <!-- 프리셋 -->
-  <div class="setting-group">
-    <h3>📋 프리셋</h3>
-    <div class="preset-btns">
-      <button class="preset-btn active" onclick="applyPreset('wnyotti')">🐋 워뇨띠</button>
-      <button class="preset-btn" onclick="applyPreset('aggressive')">🔥 공격적</button>
-      <button class="preset-btn" onclick="applyPreset('conservative')">🛡️ 보수적</button>
-      <button class="preset-btn" onclick="applyPreset('scalping')">⚡ 스캘핑</button>
+  <div class="sg"><h3>📋 프리셋</h3>
+    <div class="preset-grid">
+      <button class="preset active" onclick="applyPreset('wnyotti',this)">🐋 워뇨띠</button>
+      <button class="preset" onclick="applyPreset('aggressive',this)">🔥 공격적</button>
+      <button class="preset" onclick="applyPreset('conservative',this)">🛡️ 보수적</button>
+      <button class="preset" onclick="applyPreset('scalping',this)">⚡ 스캘핑</button>
+      <button class="preset" onclick="applyPreset('trend',this)">📈 추세추종</button>
+      <button class="preset" onclick="applyPreset('reversal',this)">🔄 반전매매</button>
     </div>
   </div>
 
-  <!-- 자산 설정 -->
-  <div class="setting-group">
-    <h3>💰 자산 설정</h3>
-    <div class="setting-row">
-      <label>시작 자금 (억원) <span class="val" id="v_capital">100</span></label>
-      <input type="range" id="capital" min="1" max="500" value="100" step="1">
-    </div>
-    <div class="setting-row">
-      <label>레버리지 <span class="val" id="v_leverage">3</span>x</label>
-      <input type="range" id="leverage" min="1" max="20" value="3" step="1">
-    </div>
-    <div class="setting-row">
-      <label>1회 진입 비율 <span class="val" id="v_posSize">30</span>%</label>
-      <input type="range" id="posSize" min="5" max="100" value="30" step="5">
-    </div>
+  <div class="sg"><h3>💰 자산 / 레버리지</h3>
+    <div class="sr"><label>시작 자금 (억원) <span class="v" id="v_capital">100</span></label><input type="range" id="capital" min="1" max="500" value="100"></div>
+    <div class="sr"><label>레버리지 <span class="v" id="v_leverage">3</span>x</label><input type="range" id="leverage" min="1" max="20" value="3"></div>
+    <div class="sr"><label>1회 진입 비율 <span class="v" id="v_posSize">30</span>%</label><input type="range" id="posSize" min="5" max="100" value="30" step="5"></div>
   </div>
 
-  <!-- 진입/청산 -->
-  <div class="setting-group">
-    <h3>🎯 진입 / 청산</h3>
-    <div class="setting-row">
-      <label>익절 목표 <span class="val" id="v_takeProfit">3.0</span>%</label>
-      <input type="range" id="takeProfit" min="0.5" max="15" value="3" step="0.5">
-    </div>
-    <div class="setting-row">
-      <label>손절 라인 <span class="val" id="v_stopLoss">3.0</span>%</label>
-      <input type="range" id="stopLoss" min="0.5" max="10" value="3" step="0.5">
-    </div>
-    <div class="setting-row">
-      <label>분할 진입 횟수 <span class="val" id="v_splitEntry">2</span></label>
-      <input type="range" id="splitEntry" min="1" max="5" value="2" step="1">
-    </div>
+  <div class="sg"><h3>🎯 진입 / 청산</h3>
+    <div class="sr"><label>익절 목표 <span class="v" id="v_takeProfit">5.0</span>%</label><input type="range" id="takeProfit" min="0.5" max="20" value="5" step="0.5"></div>
+    <div class="sr"><label>손절 라인 <span class="v" id="v_stopLoss">3.0</span>%</label><input type="range" id="stopLoss" min="0.5" max="10" value="3" step="0.5"></div>
+    <div class="sr"><label>최소 시그널 스코어 <span class="v" id="v_minScore">2.5</span></label><input type="range" id="minScore" min="1" max="5" value="2.5" step="0.5"></div>
   </div>
 
-  <!-- 시그널 지표 -->
-  <div class="setting-group">
-    <h3>📊 시그널 지표</h3>
-    <div class="setting-row">
-      <label>RSI 기간 <span class="val" id="v_rsiPeriod">14</span></label>
-      <input type="range" id="rsiPeriod" min="5" max="30" value="14" step="1">
-    </div>
-    <div class="setting-row">
-      <label>RSI 과매도 <span class="val" id="v_rsiOversold">30</span></label>
-      <input type="range" id="rsiOversold" min="10" max="40" value="30" step="1">
-    </div>
-    <div class="setting-row">
-      <label>RSI 과매수 <span class="val" id="v_rsiOverbought">70</span></label>
-      <input type="range" id="rsiOverbought" min="60" max="90" value="70" step="1">
-    </div>
-    <div class="setting-row">
-      <label>단기 EMA <span class="val" id="v_emaShort">9</span></label>
-      <input type="range" id="emaShort" min="3" max="20" value="9" step="1">
-    </div>
-    <div class="setting-row">
-      <label>장기 EMA <span class="val" id="v_emaLong">21</span></label>
-      <input type="range" id="emaLong" min="10" max="50" value="21" step="1">
-    </div>
+  <div class="sg"><h3>📊 RSI</h3>
+    <div class="sr"><label>RSI 기간 <span class="v" id="v_rsiPeriod">14</span></label><input type="range" id="rsiPeriod" min="5" max="30" value="14"></div>
+    <div class="sr"><label>과매도 <span class="v" id="v_rsiOS">30</span></label><input type="range" id="rsiOS" min="10" max="40" value="30"></div>
+    <div class="sr"><label>과매수 <span class="v" id="v_rsiOB">70</span></label><input type="range" id="rsiOB" min="60" max="90" value="70"></div>
   </div>
 
-  <!-- 거래량 -->
-  <div class="setting-group">
-    <h3>📈 거래량 필터</h3>
-    <div class="setting-row">
-      <label>거래량 급증 배율 <span class="val" id="v_volSpike">2.0</span>x</label>
-      <input type="range" id="volSpike" min="1" max="5" value="2" step="0.1">
-    </div>
-    <div class="setting-row">
-      <label>거래량 MA 기간 <span class="val" id="v_volMaPeriod">20</span></label>
-      <input type="range" id="volMaPeriod" min="5" max="50" value="20" step="1">
-    </div>
+  <div class="sg"><h3>📈 이동평균 (EMA)</h3>
+    <div class="sr"><label>단기 EMA <span class="v" id="v_emaS">9</span></label><input type="range" id="emaS" min="3" max="20" value="9"></div>
+    <div class="sr"><label>장기 EMA <span class="v" id="v_emaL">21</span></label><input type="range" id="emaL" min="10" max="50" value="21"></div>
   </div>
 
-  <!-- 캔들 패턴 -->
-  <div class="setting-group">
-    <h3>🕯️ 캔들 패턴</h3>
-    <div class="setting-row">
-      <label>장대양봉 기준 <span class="val" id="v_bigCandle">3.0</span>%</label>
-      <input type="range" id="bigCandle" min="1" max="10" value="3" step="0.5">
-    </div>
-    <div class="setting-row">
-      <label>
-        <input type="checkbox" id="useHammer" checked> 망치형 캔들 감지
-      </label>
-    </div>
-    <div class="setting-row">
-      <label>
-        <input type="checkbox" id="useDoji" checked> 도지 캔들 감지
-      </label>
-    </div>
+  <div class="sg"><h3>📏 볼린저밴드</h3>
+    <div class="sr"><label><span class="cb"><input type="checkbox" id="useBB" checked> 볼린저밴드 사용</span></label></div>
+    <div class="sr"><label>기간 <span class="v" id="v_bbPeriod">20</span></label><input type="range" id="bbPeriod" min="10" max="50" value="20"></div>
+    <div class="sr"><label>표준편차 배수 <span class="v" id="v_bbStd">2.0</span></label><input type="range" id="bbStd" min="1" max="3" value="2" step="0.1"></div>
   </div>
 
-  <button class="btn-run" onclick="runBacktest()">🚀 백테스팅 실행</button>
-  <button class="btn-reset" onclick="applyPreset('wnyotti')">↻ 워뇨띠 기본값 복원</button>
+  <div class="sg"><h3>📉 MACD</h3>
+    <div class="sr"><label><span class="cb"><input type="checkbox" id="useMACD" checked> MACD 사용</span></label></div>
+    <div class="sr"><label>Fast <span class="v" id="v_macdF">12</span></label><input type="range" id="macdF" min="5" max="20" value="12"></div>
+    <div class="sr"><label>Slow <span class="v" id="v_macdSl">26</span></label><input type="range" id="macdSl" min="15" max="50" value="26"></div>
+    <div class="sr"><label>Signal <span class="v" id="v_macdSig">9</span></label><input type="range" id="macdSig" min="3" max="15" value="9"></div>
+  </div>
+
+  <div class="sg"><h3>📊 거래량 / 캔들</h3>
+    <div class="sr"><label>거래량 급증 배율 <span class="v" id="v_volSpike">2.0</span>x</label><input type="range" id="volSpike" min="1" max="5" value="2" step="0.1"></div>
+    <div class="sr"><label>장대봉 기준 <span class="v" id="v_bigCandle">3.0</span>%</label><input type="range" id="bigCandle" min="1" max="10" value="3" step="0.5"></div>
+    <div class="sr"><label><span class="cb"><input type="checkbox" id="useHammer" checked> 망치형</span> <span class="cb"><input type="checkbox" id="useDoji" checked> 도지</span></label></div>
+  </div>
+
+  <div class="sg"><h3>🎰 몬테카를로</h3>
+    <div class="sr"><label>시뮬레이션 횟수 <span class="v" id="v_mcRuns">1000</span></label><input type="range" id="mcRuns" min="100" max="5000" value="1000" step="100"></div>
+  </div>
+
+  <button class="btn btn-run" onclick="runBacktest()">🚀 백테스팅 실행</button>
+  <button class="btn btn-sec" onclick="applyPreset('wnyotti')">↻ 기본값 복원</button>
 </div>
 
-<!-- 메인 콘텐츠 -->
 <div class="main">
   <div class="header">
-    <h1>₿ 워뇨띠 스타일 BTC 트레이딩 대시보드</h1>
-    <p id="dateRange">📅 실제 바이낸스 데이터 · 최근 90일</p>
+    <h1>₿ 워뇨띠 Pro 트레이딩 대시보드 v2.0</h1>
+    <p id="dateRange">📅 실제 바이낸스 데이터</p>
   </div>
 
-  <!-- 요약 카드 -->
-  <div class="summary-grid">
-    <div class="card"><div class="label">시작 자금</div><div class="value neutral" id="s_start">₩100억</div></div>
-    <div class="card"><div class="label">최종 자산</div><div class="value" id="s_end">-</div></div>
-    <div class="card"><div class="label">수익률</div><div class="value" id="s_return">-</div></div>
-    <div class="card"><div class="label">총 거래</div><div class="value blue" id="s_trades">-</div></div>
-    <div class="card"><div class="label">승률</div><div class="value" id="s_winrate">-</div></div>
-    <div class="card"><div class="label">최대 낙폭(MDD)</div><div class="value" id="s_mdd">-</div></div>
-    <div class="card"><div class="label">평균 수익/건</div><div class="value" id="s_avgWin">-</div></div>
-    <div class="card"><div class="label">평균 손실/건</div><div class="value" id="s_avgLoss">-</div></div>
+  <!-- 요약 카드 (확장) -->
+  <div class="grid8">
+    <div class="card"><div class="lb">시작 자금</div><div class="vl neutral" id="s_start">₩100억</div></div>
+    <div class="card"><div class="lb">최종 자산</div><div class="vl" id="s_end">-</div></div>
+    <div class="card"><div class="lb">수익률</div><div class="vl" id="s_return">-</div></div>
+    <div class="card"><div class="lb">총 거래</div><div class="vl blue" id="s_trades">-</div></div>
+    <div class="card"><div class="lb">승률</div><div class="vl" id="s_winrate">-</div></div>
+    <div class="card"><div class="lb">MDD</div><div class="vl" id="s_mdd">-</div></div>
+    <div class="card"><div class="lb">샤프 비율</div><div class="vl" id="s_sharpe">-</div></div>
+    <div class="card"><div class="lb">손익비 (R:R)</div><div class="vl" id="s_rr">-</div></div>
+    <div class="card"><div class="lb">켈리 기준</div><div class="vl" id="s_kelly">-</div><div class="sb" id="s_kelly_sub">최적 베팅</div></div>
+    <div class="card"><div class="lb">최대 연속 손실</div><div class="vl" id="s_maxLoss">-</div></div>
+    <div class="card"><div class="lb">최대 연속 수익</div><div class="vl" id="s_maxWin">-</div></div>
+    <div class="card"><div class="lb">파산 확률</div><div class="vl" id="s_ruin">-</div></div>
   </div>
 
-  <!-- 가격 차트 -->
-  <div class="chart-box">
-    <h2>📈 BTC 가격 & 매매 시그널</h2>
-    <div class="chart-wrap"><canvas id="priceChart"></canvas></div>
+  <!-- 탭 -->
+  <div class="tabs" id="tabBar">
+    <div class="tab active" data-tab="charts" onclick="switchTab('charts',this)">📈 차트</div>
+    <div class="tab" data-tab="trades" onclick="switchTab('trades',this)">📋 거래내역</div>
+    <div class="tab" data-tab="monte" onclick="switchTab('monte',this)">🎰 몬테카를로</div>
+    <div class="tab" data-tab="heatmap" onclick="switchTab('heatmap',this)">🗓️ 히트맵</div>
+    <div class="tab" data-tab="compare" onclick="switchTab('compare',this)">⚔️ 전략비교</div>
   </div>
 
-  <!-- 포트폴리오 -->
-  <div class="chart-box">
-    <h2>💰 포트폴리오 가치 변화</h2>
-    <div class="chart-wrap"><canvas id="portfolioChart"></canvas></div>
+  <!-- 차트 탭 -->
+  <div id="tab_charts">
+    <div class="box"><h2>📈 BTC 가격 + EMA + 볼린저밴드 + 매매시그널</h2><div class="cw"><canvas id="priceChart"></canvas></div></div>
+    <div class="box"><h2>💰 포트폴리오 가치 + 피보나치</h2><div class="cw"><canvas id="portfolioChart"></canvas></div></div>
+    <div class="box"><h2>📊 RSI</h2><div class="cw sm"><canvas id="rsiChart"></canvas></div></div>
+    <div class="box"><h2>📉 MACD</h2><div class="cw sm"><canvas id="macdChart"></canvas></div></div>
+    <div class="box"><h2>📊 거래량</h2><div class="cw xs"><canvas id="volumeChart"></canvas></div></div>
   </div>
 
-  <!-- RSI -->
-  <div class="chart-box">
-    <h2>📊 RSI 지표</h2>
-    <div class="chart-wrap small"><canvas id="rsiChart"></canvas></div>
-  </div>
-
-  <!-- 거래량 -->
-  <div class="chart-box">
-    <h2>📊 거래량 & 급증 감지</h2>
-    <div class="chart-wrap small"><canvas id="volumeChart"></canvas></div>
-  </div>
-
-  <!-- VS 비교 -->
-  <div class="chart-box">
-    <h2>⚔️ 전략 vs 단순 홀딩 비교</h2>
-    <div class="chart-wrap"><canvas id="compareChart"></canvas></div>
-  </div>
-
-  <!-- 거래 내역 -->
-  <div class="chart-box">
-    <h2>📋 거래 내역</h2>
-    <div class="trades-wrap">
-      <table>
-        <thead><tr><th>날짜</th><th>타입</th><th>가격</th><th>포지션</th><th>손익</th><th>누적 자산</th></tr></thead>
-        <tbody id="tradesBody"></tbody>
-      </table>
+  <!-- 거래내역 탭 -->
+  <div id="tab_trades" style="display:none">
+    <div class="box"><h2>📋 거래 내역 (캔들 패턴 라벨 포함)</h2>
+      <div class="tbl-wrap"><table><thead><tr><th>날짜</th><th>타입</th><th>가격</th><th>포지션</th><th>패턴</th><th>손익</th><th>누적</th></tr></thead><tbody id="tradesBody"></tbody></table></div>
     </div>
   </div>
 
-  <div class="footer">
-    ⚠️ 이 시뮬레이션은 과거 데이터 기반 가상 트레이딩이며, 실제 투자 수익을 보장하지 않습니다.<br>
-    소놀봇 💕 · Claude Opus 4.6 · 2026.03.15
+  <!-- 몬테카를로 탭 -->
+  <div id="tab_monte" style="display:none">
+    <div class="box"><h2>🎰 몬테카를로 시뮬레이션</h2>
+      <div class="mc-grid" id="mcStats"></div>
+      <div class="cw" style="margin-top:14px"><canvas id="mcChart"></canvas></div>
+    </div>
   </div>
+
+  <!-- 히트맵 탭 -->
+  <div id="tab_heatmap" style="display:none">
+    <div class="box"><h2>🗓️ 요일별 수익률 히트맵</h2><div id="heatmapArea"></div></div>
+    <div class="box"><h2>📊 거래 분포</h2><div class="cw sm"><canvas id="distChart"></canvas></div></div>
+  </div>
+
+  <!-- 전략비교 탭 -->
+  <div id="tab_compare" style="display:none">
+    <div class="box"><h2>⚔️ 전략 vs 단순 홀딩</h2><div class="cw"><canvas id="compareChart"></canvas></div></div>
+  </div>
+
+  <div class="footer">⚠️ 과거 데이터 기반 가상 트레이딩이며, 실제 투자 수익을 보장하지 않습니다. · 워뇨띠 Pro v2.0 · 2026.03.15</div>
 </div>
 </div>
 
 <script>
-// ========== 실제 BTC 데이터 ==========
 const RAW_DATA = [{"time": 1765843200000, "open": 86432.08, "high": 88175.98, "low": 85266.0, "close": 87863.42, "volume": 18456.05017}, {"time": 1765929600000, "open": 87863.43, "high": 90365.85, "low": 85314.0, "close": 86243.22, "volume": 19834.11729}, {"time": 1766016000000, "open": 86243.23, "high": 89477.61, "low": 84450.01, "close": 85516.41, "volume": 25405.41763}, {"time": 1766102400000, "open": 85516.41, "high": 89399.97, "low": 85110.24, "close": 88136.94, "volume": 21256.65004}, {"time": 1766188800000, "open": 88136.95, "high": 88573.07, "low": 87795.76, "close": 88360.9, "volume": 5123.13194}, {"time": 1766275200000, "open": 88360.91, "high": 89081.77, "low": 87600.04, "close": 88658.86, "volume": 7132.87258}, {"time": 1766361600000, "open": 88658.87, "high": 90588.23, "low": 87900.0, "close": 88620.79, "volume": 14673.2197}, {"time": 1766448000000, "open": 88620.79, "high": 88940.0, "low": 86601.9, "close": 87486.0, "volume": 13910.32904}, {"time": 1766534400000, "open": 87486.0, "high": 88049.89, "low": 86420.0, "close": 87669.45, "volume": 9140.8432}, {"time": 1766620800000, "open": 87669.44, "high": 88592.74, "low": 86934.72, "close": 87225.27, "volume": 7096.58235}, {"time": 1766707200000, "open": 87225.27, "high": 89567.75, "low": 86655.08, "close": 87369.56, "volume": 18344.61505}, {"time": 1766793600000, "open": 87369.56, "high": 87984.0, "low": 87253.05, "close": 87877.01, "volume": 4469.55156}, {"time": 1766880000000, "open": 87877.0, "high": 88088.75, "low": 87435.0, "close": 87952.71, "volume": 4446.29285}, {"time": 1766966400000, "open": 87952.71, "high": 90406.08, "low": 86806.5, "close": 87237.13, "volume": 19894.98575}, {"time": 1767052800000, "open": 87237.13, "high": 89400.0, "low": 86845.66, "close": 88485.49, "volume": 13105.91001}, {"time": 1767139200000, "open": 88485.5, "high": 89200.0, "low": 87250.0, "close": 87648.22, "volume": 11558.62047}, {"time": 1767225600000, "open": 87648.21, "high": 88919.45, "low": 87550.43, "close": 88839.04, "volume": 6279.57133}, {"time": 1767312000000, "open": 88839.05, "high": 90961.81, "low": 88379.88, "close": 89995.13, "volume": 17396.97301}, {"time": 1767398400000, "open": 89995.14, "high": 90741.16, "low": 89314.01, "close": 90628.01, "volume": 7057.46716}, {"time": 1767484800000, "open": 90628.01, "high": 91810.0, "low": 90628.0, "close": 91529.73, "volume": 10426.5297}, {"time": 1767571200000, "open": 91529.74, "high": 94789.08, "low": 91514.81, "close": 93859.71, "volume": 20673.59584}, {"time": 1767657600000, "open": 93859.71, "high": 94444.44, "low": 91262.94, "close": 93747.97, "volume": 18546.41829}, {"time": 1767744000000, "open": 93747.97, "high": 93747.97, "low": 90675.52, "close": 91364.16, "volume": 14276.49025}, {"time": 1767830400000, "open": 91364.16, "high": 91687.99, "low": 89311.0, "close": 91099.99, "volume": 16132.79117}, {"time": 1767916800000, "open": 91100.0, "high": 92082.55, "low": 89694.66, "close": 90641.28, "volume": 15590.27939}, {"time": 1768003200000, "open": 90641.27, "high": 90832.0, "low": 90404.0, "close": 90504.7, "volume": 3104.11722}, {"time": 1768089600000, "open": 90504.7, "high": 91283.89, "low": 90236.0, "close": 91013.65, "volume": 5477.13594}, {"time": 1768176000000, "open": 91013.66, "high": 92519.95, "low": 90128.44, "close": 91296.2, "volume": 16188.08268}, {"time": 1768262400000, "open": 91296.2, "high": 96495.0, "low": 91042.66, "close": 95414.0, "volume": 23021.51482}, {"time": 1768348800000, "open": 95413.99, "high": 97924.49, "low": 94559.28, "close": 96951.78, "volume": 22851.89428}, {"time": 1768435200000, "open": 96951.78, "high": 97193.34, "low": 95134.48, "close": 95604.8, "volume": 21725.81369}, {"time": 1768521600000, "open": 95604.81, "high": 95871.47, "low": 94293.46, "close": 95550.94, "volume": 11167.7146}, {"time": 1768608000000, "open": 95550.94, "high": 95639.45, "low": 95021.67, "close": 95147.77, "volume": 4280.80137}, {"time": 1768694400000, "open": 95147.77, "high": 95531.12, "low": 93615.4, "close": 93673.14, "volume": 6895.17819}, {"time": 1768780800000, "open": 93673.14, "high": 93673.14, "low": 91910.2, "close": 92631.0, "volume": 14295.52747}, {"time": 1768867200000, "open": 92630.99, "high": 92870.0, "low": 87895.98, "close": 88427.66, "volume": 22007.3261}, {"time": 1768953600000, "open": 88427.66, "high": 90574.0, "low": 87263.53, "close": 89454.73, "volume": 20617.50372}, {"time": 1769040000000, "open": 89454.73, "high": 90359.99, "low": 88515.37, "close": 89559.67, "volume": 10825.50492}, {"time": 1769126400000, "open": 89559.68, "high": 91224.99, "low": 88578.36, "close": 89600.26, "volume": 13918.48919}, {"time": 1769212800000, "open": 89600.26, "high": 89957.39, "low": 89162.08, "close": 89225.34, "volume": 4226.56737}, {"time": 1769299200000, "open": 89225.34, "high": 89319.13, "low": 86074.72, "close": 86670.36, "volume": 14426.22019}, {"time": 1769385600000, "open": 86670.36, "high": 88860.0, "low": 86509.63, "close": 88347.08, "volume": 17766.51453}, {"time": 1769472000000, "open": 88347.08, "high": 89523.16, "low": 87304.33, "close": 89250.0, "volume": 13125.40425}, {"time": 1769558400000, "open": 89249.99, "high": 90600.0, "low": 88833.65, "close": 89299.99, "volume": 14332.18502}, {"time": 1769644800000, "open": 89300.0, "high": 89348.0, "low": 83383.33, "close": 84650.16, "volume": 30431.38201}, {"time": 1769731200000, "open": 84650.16, "high": 84735.75, "low": 81118.0, "close": 84260.49, "volume": 35195.84793}, {"time": 1769817600000, "open": 84260.5, "high": 84270.02, "low": 75719.9, "close": 78741.09, "volume": 39491.89133}, {"time": 1769904000000, "open": 78741.1, "high": 79424.0, "low": 75700.0, "close": 76968.21, "volume": 25395.48168}, {"time": 1769990400000, "open": 76968.22, "high": 79360.0, "low": 74604.0, "close": 78738.61, "volume": 42273.59016}, {"time": 1770076800000, "open": 78738.6, "high": 79186.81, "low": 72945.5, "close": 75770.21, "volume": 39120.10889}, {"time": 1770163200000, "open": 75770.21, "high": 76971.52, "low": 71888.0, "close": 73165.83, "volume": 38375.36}, {"time": 1770249600000, "open": 73165.84, "high": 73341.18, "low": 62345.0, "close": 62909.86, "volume": 106298.82899}, {"time": 1770336000000, "open": 62909.87, "high": 71751.33, "low": 60000.0, "close": 70580.26, "volume": 92539.21531}, {"time": 1770422400000, "open": 70580.26, "high": 71690.07, "low": 67300.0, "close": 69289.38, "volume": 44255.48036}, {"time": 1770508800000, "open": 69289.37, "high": 72271.41, "low": 68888.0, "close": 70330.38, "volume": 21420.53168}, {"time": 1770595200000, "open": 70330.38, "high": 71453.53, "low": 68308.0, "close": 70138.0, "volume": 29152.72842}, {"time": 1770681600000, "open": 70138.0, "high": 70527.59, "low": 67800.0, "close": 68841.29, "volume": 20373.77072}, {"time": 1770768000000, "open": 68841.28, "high": 69292.88, "low": 65756.0, "close": 67082.52, "volume": 28718.24602}, {"time": 1770854400000, "open": 67082.52, "high": 68410.52, "low": 65118.0, "close": 66272.17, "volume": 24271.74283}, {"time": 1770940800000, "open": 66272.17, "high": 69482.97, "low": 65872.46, "close": 68853.96, "volume": 20244.54955}, {"time": 1771027200000, "open": 68853.97, "high": 70560.01, "low": 68730.13, "close": 69822.95, "volume": 18114.78393}, {"time": 1771113600000, "open": 69822.94, "high": 70983.0, "low": 68000.0, "close": 68832.58, "volume": 22290.05208}, {"time": 1771200000000, "open": 68832.59, "high": 70126.67, "low": 67294.11, "close": 68892.43, "volume": 15515.76534}, {"time": 1771286400000, "open": 68892.43, "high": 69241.5, "low": 66621.06, "close": 67503.52, "volume": 16489.06921}, {"time": 1771372800000, "open": 67503.52, "high": 68476.22, "low": 65870.0, "close": 66461.0, "volume": 15492.43839}, {"time": 1771459200000, "open": 66461.0, "high": 67320.0, "low": 65631.83, "close": 67003.73, "volume": 14542.26988}, {"time": 1771545600000, "open": 67003.73, "high": 68318.39, "low": 66280.2, "close": 68020.01, "volume": 35351.87091}, {"time": 1771632000000, "open": 68020.0, "high": 68698.7, "low": 67534.69, "close": 67975.93, "volume": 8032.84131}, {"time": 1771718400000, "open": 67975.93, "high": 68245.0, "low": 67190.0, "close": 67643.4, "volume": 8175.13484}, {"time": 1771804800000, "open": 67643.39, "high": 67684.86, "low": 63888.79, "close": 64656.02, "volume": 33075.90923}, {"time": 1771891200000, "open": 64656.01, "high": 65026.75, "low": 62510.28, "close": 64058.15, "volume": 23102.83622}, {"time": 1771977600000, "open": 64058.15, "high": 69988.83, "low": 63913.27, "close": 67988.04, "volume": 30749.99259}, {"time": 1772064000000, "open": 67988.04, "high": 68860.0, "low": 66500.0, "close": 67485.18, "volume": 20737.77792}, {"time": 1772150400000, "open": 67485.19, "high": 68216.8, "low": 64914.46, "close": 65872.1, "volume": 21228.58424}, {"time": 1772236800000, "open": 65872.09, "high": 67760.0, "low": 63030.0, "close": 66973.26, "volume": 22548.71649}, {"time": 1772323200000, "open": 66973.26, "high": 68199.99, "low": 65056.0, "close": 65776.47, "volume": 23201.85859}, {"time": 1772409600000, "open": 65776.48, "high": 70096.0, "low": 65259.21, "close": 68830.06, "volume": 32010.38431}, {"time": 1772496000000, "open": 68830.06, "high": 69258.08, "low": 66158.0, "close": 68338.0, "volume": 24972.2418}, {"time": 1772582400000, "open": 68338.01, "high": 74050.0, "low": 67400.0, "close": 72666.77, "volume": 44919.0761}, {"time": 1772668800000, "open": 72666.77, "high": 73558.15, "low": 70645.47, "close": 70890.72, "volume": 26590.51253}, {"time": 1772755200000, "open": 70891.02, "high": 71419.98, "low": 67744.78, "close": 68114.02, "volume": 22629.88722}, {"time": 1772841600000, "open": 68114.02, "high": 68551.04, "low": 66915.26, "close": 67262.91, "volume": 12719.54315}, {"time": 1772928000000, "open": 67262.91, "high": 68200.0, "low": 65618.49, "close": 65971.2, "volume": 21593.63901}, {"time": 1773014400000, "open": 65971.2, "high": 69516.65, "low": 65821.97, "close": 68432.16, "volume": 28896.7213}, {"time": 1773100800000, "open": 68432.16, "high": 71777.0, "low": 68391.41, "close": 69948.63, "volume": 32602.57726}, {"time": 1773187200000, "open": 69948.64, "high": 71321.0, "low": 68977.91, "close": 70191.86, "volume": 27249.27542}, {"time": 1773273600000, "open": 70191.86, "high": 70800.0, "low": 69205.91, "close": 70541.34, "volume": 21997.1605}, {"time": 1773360000000, "open": 70541.34, "high": 73913.74, "low": 70386.01, "close": 70930.0, "volume": 35996.61678}, {"time": 1773446400000, "open": 70930.01, "high": 71307.92, "low": 70317.0, "close": 71211.95, "volume": 13017.24737}, {"time": 1773532800000, "open": 71211.95, "high": 71800.68, "low": 70858.82, "close": 71589.74, "volume": 5311.60629}];
 
-// ========== 유틸리티 ==========
-function calcEMA(data, period) {
-  const k = 2 / (period + 1);
-  const r = [data[0]];
-  for (let i = 1; i < data.length; i++) r.push(data[i] * k + r[i-1] * (1 - k));
-  return r;
-}
+// ===== 유틸리티 =====
+const fmt = n => n.toLocaleString('ko-KR');
+const fmtB = n => (n/1e8).toFixed(1)+'억';
+const fmtD = ts => {const d=new Date(ts);return `${d.getMonth()+1}/${d.getDate()}`};
+function calcEMA(d,p){const k=2/(p+1);const r=[d[0]];for(let i=1;i<d.length;i++)r.push(d[i]*k+r[i-1]*(1-k));return r}
+function calcSMA(d,p){const r=[];for(let i=0;i<d.length;i++){if(i<p-1){r.push(null);continue}let s=0;for(let j=i-p+1;j<=i;j++)s+=d[j];r.push(s/p)}return r}
+function calcRSI(c,p){const r=new Array(c.length).fill(50);if(c.length<p+1)return r;let gS=0,lS=0;for(let i=1;i<=p;i++){const d=c[i]-c[i-1];if(d>0)gS+=d;else lS+=Math.abs(d)}let aG=gS/p,aL=lS/p;r[p]=aL===0?100:100-100/(1+aG/aL);for(let i=p+1;i<c.length;i++){const d=c[i]-c[i-1];aG=(aG*(p-1)+(d>0?d:0))/p;aL=(aL*(p-1)+(d<0?Math.abs(d):0))/p;r[i]=aL===0?100:100-100/(1+aG/aL)}return r}
+function calcBB(c,p,std){const sma=calcSMA(c,p);const upper=[],lower=[];for(let i=0;i<c.length;i++){if(sma[i]===null){upper.push(null);lower.push(null);continue}let ss=0;for(let j=i-p+1;j<=i;j++)ss+=Math.pow(c[j]-sma[i],2);const sd=Math.sqrt(ss/p);upper.push(sma[i]+sd*std);lower.push(sma[i]-sd*std)}return{sma,upper,lower}}
+function calcMACD(c,f,s,sig){const eF=calcEMA(c,f),eS=calcEMA(c,s);const macd=eF.map((v,i)=>v-eS[i]);const signal=calcEMA(macd,sig);const hist=macd.map((v,i)=>v-signal[i]);return{macd,signal,hist}}
+function calcFib(vals){const mn=Math.min(...vals),mx=Math.max(...vals),d=mx-mn;return{0:mx,0.236:mx-d*0.236,0.382:mx-d*0.382,0.5:mx-d*0.5,0.618:mx-d*0.618,0.786:mx-d*0.786,1:mn}}
 
-function calcRSI(closes, period) {
-  const rsi = new Array(closes.length).fill(50);
-  if (closes.length < period + 1) return rsi;
-  let gainSum = 0, lossSum = 0;
-  for (let i = 1; i <= period; i++) {
-    const diff = closes[i] - closes[i-1];
-    if (diff > 0) gainSum += diff; else lossSum += Math.abs(diff);
-  }
-  let avgGain = gainSum / period, avgLoss = lossSum / period;
-  rsi[period] = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss);
-  for (let i = period + 1; i < closes.length; i++) {
-    const diff = closes[i] - closes[i-1];
-    avgGain = (avgGain * (period - 1) + (diff > 0 ? diff : 0)) / period;
-    avgLoss = (avgLoss * (period - 1) + (diff < 0 ? Math.abs(diff) : 0)) / period;
-    rsi[i] = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss);
-  }
-  return rsi;
-}
+// ===== 설정 =====
+function getS(){return{
+  capital:+$('capital').value*1e8,leverage:+$('leverage').value,posSize:+$('posSize').value/100,
+  takeProfit:+$('takeProfit').value/100,stopLoss:+$('stopLoss').value/100,minScore:+$('minScore').value,
+  rsiP:+$('rsiPeriod').value,rsiOS:+$('rsiOS').value,rsiOB:+$('rsiOB').value,
+  emaS:+$('emaS').value,emaL:+$('emaL').value,
+  useBB:$('useBB').checked,bbP:+$('bbPeriod').value,bbStd:+$('bbStd').value,
+  useMACD:$('useMACD').checked,macdF:+$('macdF').value,macdSl:+$('macdSl').value,macdSig:+$('macdSig').value,
+  volSpike:+$('volSpike').value,bigCandle:+$('bigCandle').value/100,
+  useHammer:$('useHammer').checked,useDoji:$('useDoji').checked,
+  mcRuns:+$('mcRuns').value
+}}
+function $(id){return document.getElementById(id)}
 
-function calcSMA(data, period) {
-  const r = [];
-  for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) { r.push(null); continue; }
-    let sum = 0;
-    for (let j = i - period + 1; j <= i; j++) sum += data[j];
-    r.push(sum / period);
-  }
-  return r;
-}
-
-function fmt(n) { return n.toLocaleString('ko-KR'); }
-function fmtBil(n) { return (n / 100000000).toFixed(1) + '억'; }
-function fmtDate(ts) {
-  const d = new Date(ts);
-  return `${d.getMonth()+1}/${d.getDate()}`;
-}
-
-// ========== 설정값 읽기 ==========
-function getSettings() {
-  return {
-    capital: +document.getElementById('capital').value * 100000000,
-    leverage: +document.getElementById('leverage').value,
-    posSize: +document.getElementById('posSize').value / 100,
-    takeProfit: +document.getElementById('takeProfit').value / 100,
-    stopLoss: +document.getElementById('stopLoss').value / 100,
-    splitEntry: +document.getElementById('splitEntry').value,
-    rsiPeriod: +document.getElementById('rsiPeriod').value,
-    rsiOversold: +document.getElementById('rsiOversold').value,
-    rsiOverbought: +document.getElementById('rsiOverbought').value,
-    emaShort: +document.getElementById('emaShort').value,
-    emaLong: +document.getElementById('emaLong').value,
-    volSpike: +document.getElementById('volSpike').value,
-    volMaPeriod: +document.getElementById('volMaPeriod').value,
-    bigCandle: +document.getElementById('bigCandle').value / 100,
-    useHammer: document.getElementById('useHammer').checked,
-    useDoji: document.getElementById('useDoji').checked
-  };
-}
-
-// ========== 슬라이더 연동 ==========
-const sliders = ['capital','leverage','posSize','takeProfit','stopLoss','splitEntry',
-  'rsiPeriod','rsiOversold','rsiOverbought','emaShort','emaLong','volSpike','volMaPeriod','bigCandle'];
-sliders.forEach(id => {
-  const el = document.getElementById(id);
-  const vEl = document.getElementById('v_' + id);
-  if (el && vEl) {
-    el.addEventListener('input', () => { vEl.textContent = el.value; });
-  }
+// 슬라이더 연동
+['capital','leverage','posSize','takeProfit','stopLoss','minScore','rsiPeriod','rsiOS','rsiOB','emaS','emaL','bbPeriod','bbStd','macdF','macdSl','macdSig','volSpike','bigCandle','mcRuns'].forEach(id=>{
+  const el=$(id),vl=$('v_'+id);if(el&&vl)el.addEventListener('input',()=>{vl.textContent=el.value})
 });
 
-// ========== 프리셋 ==========
-const PRESETS = {
-  wnyotti: {capital:100,leverage:3,posSize:30,takeProfit:5,stopLoss:3,splitEntry:2,rsiPeriod:14,rsiOversold:30,rsiOverbought:70,emaShort:9,emaLong:21,volSpike:2,volMaPeriod:20,bigCandle:3,useHammer:true,useDoji:true},
-  aggressive: {capital:100,leverage:10,posSize:50,takeProfit:3,stopLoss:1.5,splitEntry:1,rsiPeriod:7,rsiOversold:25,rsiOverbought:75,emaShort:5,emaLong:13,volSpike:1.5,volMaPeriod:10,bigCandle:2,useHammer:true,useDoji:false},
-  conservative: {capital:100,leverage:2,posSize:15,takeProfit:7,stopLoss:3,splitEntry:3,rsiPeriod:21,rsiOversold:25,rsiOverbought:75,emaShort:12,emaLong:26,volSpike:2.5,volMaPeriod:30,bigCandle:4,useHammer:true,useDoji:true},
-  scalping: {capital:100,leverage:5,posSize:25,takeProfit:2,stopLoss:1,splitEntry:1,rsiPeriod:9,rsiOversold:35,rsiOverbought:65,emaShort:5,emaLong:13,volSpike:1.8,volMaPeriod:10,bigCandle:1.5,useHammer:false,useDoji:false}
+// 프리셋
+const PRESETS={
+  wnyotti:{capital:100,leverage:3,posSize:30,takeProfit:5,stopLoss:3,minScore:2.5,rsiPeriod:14,rsiOS:30,rsiOB:70,emaS:9,emaL:21,useBB:true,bbPeriod:20,bbStd:2,useMACD:true,macdF:12,macdSl:26,macdSig:9,volSpike:2,bigCandle:3,useHammer:true,useDoji:true,mcRuns:1000},
+  aggressive:{capital:100,leverage:10,posSize:50,takeProfit:3,stopLoss:1.5,minScore:2,rsiPeriod:7,rsiOS:25,rsiOB:75,emaS:5,emaL:13,useBB:true,bbPeriod:15,bbStd:1.5,useMACD:true,macdF:8,macdSl:17,macdSig:9,volSpike:1.5,bigCandle:2,useHammer:true,useDoji:false,mcRuns:1000},
+  conservative:{capital:100,leverage:2,posSize:15,takeProfit:7,stopLoss:3,minScore:3.5,rsiPeriod:21,rsiOS:25,rsiOB:75,emaS:12,emaL:26,useBB:true,bbPeriod:30,bbStd:2.5,useMACD:true,macdF:12,macdSl:26,macdSig:9,volSpike:2.5,bigCandle:4,useHammer:true,useDoji:true,mcRuns:1000},
+  scalping:{capital:100,leverage:5,posSize:25,takeProfit:2,stopLoss:1,minScore:2,rsiPeriod:9,rsiOS:35,rsiOB:65,emaS:5,emaL:13,useBB:false,bbPeriod:20,bbStd:2,useMACD:true,macdF:8,macdSl:17,macdSig:9,volSpike:1.8,bigCandle:1.5,useHammer:false,useDoji:false,mcRuns:1000},
+  trend:{capital:100,leverage:3,posSize:30,takeProfit:8,stopLoss:4,minScore:3,rsiPeriod:14,rsiOS:40,rsiOB:60,emaS:9,emaL:21,useBB:true,bbPeriod:20,bbStd:2,useMACD:true,macdF:12,macdSl:26,macdSig:9,volSpike:2,bigCandle:2,useHammer:false,useDoji:false,mcRuns:1000},
+  reversal:{capital:100,leverage:3,posSize:25,takeProfit:5,stopLoss:3,minScore:2.5,rsiPeriod:14,rsiOS:25,rsiOB:75,emaS:9,emaL:21,useBB:true,bbPeriod:20,bbStd:2.5,useMACD:false,macdF:12,macdSl:26,macdSig:9,volSpike:2,bigCandle:3,useHammer:true,useDoji:true,mcRuns:1000}
 };
-
-function applyPreset(name) {
-  const p = PRESETS[name];
-  Object.keys(p).forEach(k => {
-    const el = document.getElementById(k);
-    if (!el) return;
-    if (el.type === 'checkbox') el.checked = p[k];
-    else { el.value = p[k]; const vEl = document.getElementById('v_'+k); if(vEl) vEl.textContent = p[k]; }
-  });
-  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-  event?.target?.classList.add('active');
+function applyPreset(n,btn){
+  const p=PRESETS[n];if(!p)return;
+  Object.keys(p).forEach(k=>{const el=$(k);if(!el)return;if(el.type==='checkbox')el.checked=p[k];else{el.value=p[k];const vl=$('v_'+k);if(vl)vl.textContent=p[k]}});
+  document.querySelectorAll('.preset').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
   runBacktest();
 }
 
-// ========== 백테스팅 엔진 ==========
-let charts = {};
-
-function runBacktest() {
-  document.getElementById('loading').classList.remove('hidden');
-  setTimeout(() => { _runBacktest(); document.getElementById('loading').classList.add('hidden'); }, 100);
+// 탭 전환
+function switchTab(name,el){
+  ['charts','trades','monte','heatmap','compare'].forEach(t=>{$('tab_'+t).style.display=t===name?'block':'none'});
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
 }
 
-function _runBacktest() {
-  const S = getSettings();
-  const closes = RAW_DATA.map(d => d.close);
-  const opens = RAW_DATA.map(d => d.open);
-  const highs = RAW_DATA.map(d => d.high);
-  const lows = RAW_DATA.map(d => d.low);
-  const volumes = RAW_DATA.map(d => d.volume);
-  const labels = RAW_DATA.map(d => fmtDate(d.time));
-  const N = closes.length;
-
-  // 지표 계산
-  const emaS = calcEMA(closes, S.emaShort);
-  const emaL = calcEMA(closes, S.emaLong);
-  const rsi = calcRSI(closes, S.rsiPeriod);
-  const volMA = calcSMA(volumes, S.volMaPeriod);
-
-  // 캔들 패턴 감지
-  function isBigBull(i) { return (closes[i] - opens[i]) / opens[i] >= S.bigCandle; }
-  function isBigBear(i) { return (opens[i] - closes[i]) / opens[i] >= S.bigCandle; }
-  function isHammer(i) {
-    if (!S.useHammer) return false;
-    const body = Math.abs(closes[i] - opens[i]);
-    const lower = Math.min(opens[i], closes[i]) - lows[i];
-    const upper = highs[i] - Math.max(opens[i], closes[i]);
-    return lower > body * 2 && upper < body * 0.5;
+// ===== 캔들 패턴 감지 =====
+function detectPattern(i,opens,closes,highs,lows){
+  const body=Math.abs(closes[i]-opens[i]),range=highs[i]-lows[i];
+  const bull=closes[i]>opens[i];
+  const lower=Math.min(opens[i],closes[i])-lows[i];
+  const upper=highs[i]-Math.max(opens[i],closes[i]);
+  const patterns=[];
+  if(range>0&&body/range<0.1)patterns.push('도지');
+  if(lower>body*2&&upper<body*0.5)patterns.push('망치형');
+  if(upper>body*2&&lower<body*0.5)patterns.push('유성형');
+  if(bull&&body/opens[i]>0.03)patterns.push('장대양봉');
+  if(!bull&&body/opens[i]>0.03)patterns.push('장대음봉');
+  if(i>0){
+    const pBody=Math.abs(closes[i-1]-opens[i-1]);
+    if(!bull&&closes[i-1]>opens[i-1]&&body>pBody*1.5&&closes[i]<opens[i-1])patterns.push('약세장악');
+    if(bull&&closes[i-1]<opens[i-1]&&body>pBody*1.5&&closes[i]>opens[i-1])patterns.push('강세장악');
   }
-  function isDoji(i) {
-    if (!S.useDoji) return false;
-    const body = Math.abs(closes[i] - opens[i]);
-    const range = highs[i] - lows[i];
-    return range > 0 && body / range < 0.1;
+  return patterns;
+}
+
+// ===== 백테스팅 =====
+let charts={};
+function runBacktest(){$('loading').classList.remove('hidden');setTimeout(()=>{_run();$('loading').classList.add('hidden')},50)}
+
+function _run(){
+  const S=getS();
+  const closes=RAW_DATA.map(d=>d.close),opens=RAW_DATA.map(d=>d.open),highs=RAW_DATA.map(d=>d.high),lows=RAW_DATA.map(d=>d.low),volumes=RAW_DATA.map(d=>d.volume);
+  const labels=RAW_DATA.map(d=>fmtD(d.time)),N=closes.length;
+
+  // 지표
+  const emaShort=calcEMA(closes,S.emaS),emaLong=calcEMA(closes,S.emaL);
+  const rsi=calcRSI(closes,S.rsiP);
+  const volMA=calcSMA(volumes,20);
+  const bb=S.useBB?calcBB(closes,S.bbP,S.bbStd):{sma:null,upper:null,lower:null};
+  const macd=S.useMACD?calcMACD(closes,S.macdF,S.macdSl,S.macdSig):{macd:null,signal:null,hist:null};
+
+  // 패턴
+  function isBigBull(i){return(closes[i]-opens[i])/opens[i]>=S.bigCandle}
+  function isBigBear(i){return(opens[i]-closes[i])/opens[i]>=S.bigCandle}
+  function isHammer(i){if(!S.useHammer)return false;const b=Math.abs(closes[i]-opens[i]),l=Math.min(opens[i],closes[i])-lows[i],u=highs[i]-Math.max(opens[i],closes[i]);return l>b*2&&u<b*0.5}
+  function isDoji(i){if(!S.useDoji)return false;const b=Math.abs(closes[i]-opens[i]),r=highs[i]-lows[i];return r>0&&b/r<0.1}
+  function isVolSpike(i){return volMA[i]&&volumes[i]>volMA[i]*S.volSpike}
+
+  // 시뮬레이션
+  let cash=S.capital,margin=0,entryPrice=0,direction=0,posQty=0;
+  const trades=[],pv=[],buyS=new Array(N).fill(null),sellS=new Array(N).fill(null);
+  const startIdx=Math.max(S.emaL,S.rsiP,20)+1;
+  for(let i=0;i<startIdx;i++)pv.push(cash);
+
+  function closePos(i,reason){
+    const price=closes[i];
+    const pnl=direction===1?(price-entryPrice)/entryPrice*margin*S.leverage:(entryPrice-price)/entryPrice*margin*S.leverage;
+    const ret=margin+pnl;cash+=Math.max(0,ret);
+    const tag=direction===1?'sell':'buy';
+    if(direction===1)sellS[i]=price;else buyS[i]=price;
+    const pats=detectPattern(i,opens,closes,highs,lows);
+    trades.push({date:labels[i],type:tag,price,amount:ret,pos:Math.abs(posQty),pnl,pnlPct:pnl/margin,portfolio:cash,reason,dir:direction===1?'롱청산':'숏청산',patterns:pats});
+    posQty=0;entryPrice=0;margin=0;direction=0
   }
-  function isVolSpike(i) {
-    return volMA[i] && volumes[i] > volMA[i] * S.volSpike;
-  }
-
-  // ========== 워뇨띠 스타일 시뮬레이션 (롱+숏 양방향) ==========
-  let cash = S.capital;
-  let posSize = 0;      // BTC 수량 (양수=롱, 음수=숏)
-  let entryPrice = 0;
-  let margin = 0;       // 증거금
-  let direction = 0;    // 0=없음, 1=롱, -1=숏
-
-  const trades = [];
-  const portfolioValues = [];
-  const buySignals = new Array(N).fill(null);
-  const sellSignals = new Array(N).fill(null);
-
-  const startIdx = Math.max(S.emaLong, S.rsiPeriod, S.volMaPeriod) + 1;
-
-  // 초기 포트폴리오 값 채우기
-  for (let i = 0; i < startIdx; i++) portfolioValues.push(cash);
-
-  // 포지션 청산 함수
-  function closePosition(i, reason) {
-    const price = closes[i];
-    let pnl;
-    if (direction === 1) { // 롱 청산
-      pnl = (price - entryPrice) / entryPrice * margin * S.leverage;
-    } else { // 숏 청산
-      pnl = (entryPrice - price) / entryPrice * margin * S.leverage;
-    }
-    const returnAmount = margin + pnl;
-    cash += Math.max(0, returnAmount);
-    const pnlPct = pnl / margin;
-
-    const tag = direction === 1 ? 'sell' : 'buy';
-    if (direction === 1) sellSignals[i] = price;
-    else buySignals[i] = price;
-
-    trades.push({
-      date: labels[i], type: tag, price: price,
-      amount: returnAmount, position: Math.abs(posSize),
-      pnl: pnl, pnlPct: pnlPct, portfolio: cash,
-      reason: reason, dir: direction === 1 ? '롱청산' : '숏청산'
-    });
-
-    posSize = 0; entryPrice = 0; margin = 0; direction = 0;
-    return pnl;
+  function openPos(i,dir){
+    margin=cash*S.posSize;cash-=margin;entryPrice=closes[i];
+    posQty=dir*margin*S.leverage/entryPrice;direction=dir;
+    const tag=dir===1?'buy':'sell';
+    if(dir===1)buyS[i]=closes[i];else sellS[i]=closes[i];
+    const pats=detectPattern(i,opens,closes,highs,lows);
+    trades.push({date:labels[i],type:tag,price:closes[i],amount:margin,pos:Math.abs(posQty),pnl:null,pnlPct:null,portfolio:cash+margin,dir:dir===1?'롱진입':'숏진입',patterns:pats})
   }
 
-  // 포지션 진입 함수
-  function openPosition(i, dir) {
-    margin = cash * S.posSize;
-    cash -= margin;
-    entryPrice = closes[i];
-    const leveragedAmount = margin * S.leverage;
-    posSize = dir * leveragedAmount / entryPrice;
-    direction = dir;
-
-    const tag = dir === 1 ? 'buy' : 'sell';
-    if (dir === 1) buySignals[i] = closes[i];
-    else sellSignals[i] = closes[i];
-
-    trades.push({
-      date: labels[i], type: tag, price: closes[i],
-      amount: margin, position: Math.abs(posSize),
-      pnl: null, pnlPct: null, portfolio: cash + margin,
-      dir: dir === 1 ? '롱진입' : '숏진입'
-    });
-  }
-
-  for (let i = startIdx; i < N; i++) {
-    // 포지션 있으면 익절/손절 체크
-    if (direction !== 0) {
-      const priceDiff = direction === 1
-        ? (closes[i] - entryPrice) / entryPrice
-        : (entryPrice - closes[i]) / entryPrice;
-
-      let shouldClose = false, reason = '';
-
-      if (priceDiff >= S.takeProfit) { shouldClose = true; reason = '익절 ✅'; }
-      else if (priceDiff <= -S.stopLoss) { shouldClose = true; reason = '손절 ❌'; }
-
-      // 롱 보유 중 → 약세 시그널
-      if (direction === 1) {
-        if (emaS[i] < emaL[i] && emaS[i-1] >= emaL[i-1]) { shouldClose = true; reason = 'EMA데드크로스'; }
-        if (rsi[i] > S.rsiOverbought && rsi[i] < rsi[i-1]) { shouldClose = true; reason = 'RSI과매수'; }
-        if (isBigBear(i) && isVolSpike(i)) { shouldClose = true; reason = '급락감지'; }
+  for(let i=startIdx;i<N;i++){
+    if(direction!==0){
+      const pd=direction===1?(closes[i]-entryPrice)/entryPrice:(entryPrice-closes[i])/entryPrice;
+      let cl=false,rs='';
+      if(pd>=S.takeProfit){cl=true;rs='익절 ✅'}
+      else if(pd<=-S.stopLoss){cl=true;rs='손절 ❌'}
+      if(direction===1){
+        if(emaShort[i]<emaLong[i]&&emaShort[i-1]>=emaLong[i-1]){cl=true;rs='EMA데드'}
+        if(rsi[i]>S.rsiOB&&rsi[i]<rsi[i-1]){cl=true;rs='RSI과매수'}
+        if(isBigBear(i)&&isVolSpike(i)){cl=true;rs='급락감지'}
+        if(S.useBB&&bb.lower[i]&&closes[i]<bb.lower[i]){cl=true;rs='BB하향돌파'}
       }
-      // 숏 보유 중 → 강세 시그널
-      if (direction === -1) {
-        if (emaS[i] > emaL[i] && emaS[i-1] <= emaL[i-1]) { shouldClose = true; reason = 'EMA골든크로스'; }
-        if (rsi[i] < S.rsiOversold && rsi[i] > rsi[i-1]) { shouldClose = true; reason = 'RSI과매도반등'; }
-        if (isBigBull(i) && isVolSpike(i)) { shouldClose = true; reason = '급등감지'; }
+      if(direction===-1){
+        if(emaShort[i]>emaLong[i]&&emaShort[i-1]<=emaLong[i-1]){cl=true;rs='EMA골든'}
+        if(rsi[i]<S.rsiOS&&rsi[i]>rsi[i-1]){cl=true;rs='RSI과매도반등'}
+        if(isBigBull(i)&&isVolSpike(i)){cl=true;rs='급등감지'}
+        if(S.useBB&&bb.upper[i]&&closes[i]>bb.upper[i]){cl=true;rs='BB상향돌파'}
       }
-
-      if (shouldClose) closePosition(i, reason);
+      if(cl)closePos(i,rs)
     }
+    if(direction===0){
+      let ls=0,ss=0;
+      if(rsi[i]<S.rsiOS&&rsi[i]>rsi[i-1])ls+=2;else if(rsi[i]<S.rsiOS+5&&rsi[i]>rsi[i-1])ls+=1;
+      if(emaShort[i]>emaLong[i]&&emaShort[i-1]<=emaLong[i-1])ls+=2;else if(emaShort[i]>emaLong[i]&&closes[i]>emaShort[i])ls+=1;
+      if(isBigBull(i)&&isVolSpike(i))ls+=2;else if(isBigBull(i))ls+=1;
+      if(isHammer(i))ls+=1.5;if(isDoji(i)&&rsi[i]<45)ls+=1;
+      if(isVolSpike(i)&&closes[i]>opens[i])ls+=1;
+      if(i>=3&&closes[i-3]>closes[i-2]&&closes[i-2]>closes[i-1]&&closes[i]>closes[i-1])ls+=1.5;
+      if(S.useBB&&bb.lower[i]&&closes[i]<=bb.lower[i]&&closes[i]>opens[i])ls+=1.5;
+      if(S.useMACD&&macd.hist[i]>0&&macd.hist[i-1]<=0)ls+=1.5;
 
-    // 포지션 없으면 진입 시그널 체크
-    if (direction === 0) {
-      let longScore = 0, shortScore = 0;
+      if(rsi[i]>S.rsiOB&&rsi[i]<rsi[i-1])ss+=2;else if(rsi[i]>S.rsiOB-5&&rsi[i]<rsi[i-1])ss+=1;
+      if(emaShort[i]<emaLong[i]&&emaShort[i-1]>=emaLong[i-1])ss+=2;else if(emaShort[i]<emaLong[i]&&closes[i]<emaShort[i])ss+=1;
+      if(isBigBear(i)&&isVolSpike(i))ss+=2;else if(isBigBear(i))ss+=1;
+      if(isVolSpike(i)&&closes[i]<opens[i])ss+=1;
+      if(i>=3&&closes[i-3]<closes[i-2]&&closes[i-2]<closes[i-1]&&closes[i]<closes[i-1])ss+=1.5;
+      const rH=Math.max(...closes.slice(Math.max(0,i-5),i));
+      if(closes[i]<rH*0.97&&rsi[i]>50)ss+=1;
+      if(S.useBB&&bb.upper[i]&&closes[i]>=bb.upper[i]&&closes[i]<opens[i])ss+=1.5;
+      if(S.useMACD&&macd.hist[i]<0&&macd.hist[i-1]>=0)ss+=1.5;
 
-      // === 롱 시그널 ===
-      if (rsi[i] < S.rsiOversold && rsi[i] > rsi[i-1]) longScore += 2;
-      else if (rsi[i] < S.rsiOversold + 5 && rsi[i] > rsi[i-1]) longScore += 1;
-      if (emaS[i] > emaL[i] && emaS[i-1] <= emaL[i-1]) longScore += 2;
-      else if (emaS[i] > emaL[i] && closes[i] > emaS[i]) longScore += 1;
-      if (isBigBull(i) && isVolSpike(i)) longScore += 2;
-      else if (isBigBull(i)) longScore += 1;
-      if (isHammer(i)) longScore += 1.5;
-      if (isDoji(i) && rsi[i] < 45) longScore += 1;
-      if (isVolSpike(i) && closes[i] > opens[i]) longScore += 1;
-      // 3일 연속 하락 후 반등 (워뇨띠 반전 매매)
-      if (i >= 3 && closes[i-3] > closes[i-2] && closes[i-2] > closes[i-1] && closes[i] > closes[i-1]) longScore += 1.5;
-
-      // === 숏 시그널 ===
-      if (rsi[i] > S.rsiOverbought && rsi[i] < rsi[i-1]) shortScore += 2;
-      else if (rsi[i] > S.rsiOverbought - 5 && rsi[i] < rsi[i-1]) shortScore += 1;
-      if (emaS[i] < emaL[i] && emaS[i-1] >= emaL[i-1]) shortScore += 2;
-      else if (emaS[i] < emaL[i] && closes[i] < emaS[i]) shortScore += 1;
-      if (isBigBear(i) && isVolSpike(i)) shortScore += 2;
-      else if (isBigBear(i)) shortScore += 1;
-      if (isVolSpike(i) && closes[i] < opens[i]) shortScore += 1;
-      // 3일 연속 상승 후 하락 (워뇨띠 반전 매매)
-      if (i >= 3 && closes[i-3] < closes[i-2] && closes[i-2] < closes[i-1] && closes[i] < closes[i-1]) shortScore += 1.5;
-      // 고점 대비 하락 시작
-      const recentHigh = Math.max(...closes.slice(Math.max(0, i-5), i));
-      if (closes[i] < recentHigh * 0.97 && rsi[i] > 50) shortScore += 1;
-
-      // 진입 결정 (스코어 2.5 이상 + 상대 우위 1점 이상)
-      const minScore = 2.5;
-      const scoreDiff = 1;
-      if (longScore >= minScore && longScore >= shortScore + scoreDiff) openPosition(i, 1);
-      else if (shortScore >= minScore && shortScore >= longScore + scoreDiff) openPosition(i, -1);
+      if(ls>=S.minScore&&ls>=ss+1)openPos(i,1);
+      else if(ss>=S.minScore&&ss>=ls+1)openPos(i,-1);
     }
-
-    // 포트폴리오 가치 기록
-    if (direction === 1) {
-      const unrealizedPnl = (closes[i] - entryPrice) / entryPrice * margin * S.leverage;
-      portfolioValues.push(cash + margin + unrealizedPnl);
-    } else if (direction === -1) {
-      const unrealizedPnl = (entryPrice - closes[i]) / entryPrice * margin * S.leverage;
-      portfolioValues.push(cash + margin + unrealizedPnl);
-    } else {
-      portfolioValues.push(cash);
-    }
+    if(direction===1){const u=(closes[i]-entryPrice)/entryPrice*margin*S.leverage;pv.push(cash+margin+u)}
+    else if(direction===-1){const u=(entryPrice-closes[i])/entryPrice*margin*S.leverage;pv.push(cash+margin+u)}
+    else pv.push(cash);
   }
+  if(direction!==0)closePos(N-1,'기간종료');
+  while(pv.length<N)pv.push(cash);if(pv.length>N)pv.length=N;
 
-  // 기간 종료 시 포지션 청산
-  if (direction !== 0) closePosition(N - 1, '기간종료');
+  // 통계
+  const closedTrades=trades.filter(t=>t.pnl!==null);
+  const wins=closedTrades.filter(t=>t.pnl>0),losses=closedTrades.filter(t=>t.pnl<=0);
+  const winRate=closedTrades.length?wins.length/closedTrades.length:0;
+  const avgWin=wins.length?wins.reduce((s,t)=>s+t.pnlPct,0)/wins.length:0;
+  const avgLoss=losses.length?Math.abs(losses.reduce((s,t)=>s+t.pnlPct,0)/losses.length):0;
+  const totalReturn=(cash-S.capital)/S.capital*100;
+  let peak=S.capital,mdd=0;pv.forEach(v=>{if(v>peak)peak=v;const dd=(peak-v)/peak*100;if(dd>mdd)mdd=dd});
 
-  // 포트폴리오 길이 맞추기
-  while (portfolioValues.length < N) portfolioValues.push(cash);
-  if (portfolioValues.length > N) portfolioValues.length = N;
+  // 샤프 비율
+  const dailyReturns=[];for(let i=1;i<pv.length;i++)dailyReturns.push((pv[i]-pv[i-1])/pv[i-1]);
+  const avgDR=dailyReturns.reduce((s,v)=>s+v,0)/dailyReturns.length||0;
+  const stdDR=Math.sqrt(dailyReturns.reduce((s,v)=>s+Math.pow(v-avgDR,2),0)/dailyReturns.length)||1;
+  const sharpe=(avgDR/stdDR)*Math.sqrt(365);
 
-  // 홀딩 비교
-  const holdValues = closes.map(c => S.capital * (c / closes[0]));
+  // 손익비
+  const rr=avgLoss>0?avgWin/avgLoss:0;
 
-  // 통계 계산
-  const sellTrades = trades.filter(t => t.type === 'sell');
-  const wins = sellTrades.filter(t => t.pnl > 0);
-  const losses = sellTrades.filter(t => t.pnl <= 0);
-  const winRate = sellTrades.length > 0 ? (wins.length / sellTrades.length * 100) : 0;
-  const avgWin = wins.length > 0 ? wins.reduce((s,t) => s + t.pnlPct, 0) / wins.length * 100 : 0;
-  const avgLoss = losses.length > 0 ? losses.reduce((s,t) => s + t.pnlPct, 0) / losses.length * 100 : 0;
-  const finalValue = cash;
-  const totalReturn = (finalValue - S.capital) / S.capital * 100;
+  // 켈리 기준
+  const kelly=avgLoss>0?winRate-(1-winRate)/rr:0;
 
-  // MDD 계산
-  let peak = S.capital, mdd = 0;
-  portfolioValues.forEach(v => { if(v > peak) peak = v; const dd = (peak - v)/peak*100; if(dd > mdd) mdd = dd; });
+  // 연속 손익
+  let maxConsWin=0,maxConsLoss=0,cw=0,cl=0;
+  closedTrades.forEach(t=>{if(t.pnl>0){cw++;cl=0;if(cw>maxConsWin)maxConsWin=cw}else{cl++;cw=0;if(cl>maxConsLoss)maxConsLoss=cl}});
+
+  // 몬테카를로
+  const mcResults=[];
+  for(let r=0;r<S.mcRuns;r++){
+    let bal=S.capital;const curve=[bal];
+    for(let t=0;t<closedTrades.length;t++){
+      const idx=Math.floor(Math.random()*closedTrades.length);
+      const pct=closedTrades[idx].pnlPct;
+      bal*=(1+pct);if(bal<=0){bal=0;break}
+      curve.push(bal);
+    }
+    mcResults.push({final:bal,curve,ruin:bal<=S.capital*0.1});
+  }
+  const ruinProb=mcResults.filter(r=>r.ruin).length/S.mcRuns*100;
+  const mcMedian=mcResults.map(r=>r.final).sort((a,b)=>a-b)[Math.floor(S.mcRuns/2)];
+  const mcBest=Math.max(...mcResults.map(r=>r.final));
+  const mcWorst=Math.min(...mcResults.map(r=>r.final));
+  const mcAvg=mcResults.reduce((s,r)=>s+r.final,0)/S.mcRuns;
+
+  // 히트맵 (요일별)
+  const dayPnl={0:[],1:[],2:[],3:[],4:[],5:[],6:[]};
+  closedTrades.forEach((t,idx)=>{
+    const ti=trades.indexOf(t);
+    if(ti>=0){const ts=RAW_DATA[Math.min(ti,N-1)]?.time;if(ts){const dow=new Date(ts).getDay();dayPnl[dow].push(t.pnlPct)}}
+  });
 
   // ===== UI 업데이트 =====
-  document.getElementById('s_start').textContent = fmtBil(S.capital);
-  document.getElementById('s_end').textContent = fmtBil(finalValue);
-  document.getElementById('s_end').className = 'value ' + (totalReturn >= 0 ? 'profit' : 'loss');
-  document.getElementById('s_return').textContent = (totalReturn >= 0 ? '+' : '') + totalReturn.toFixed(2) + '%';
-  document.getElementById('s_return').className = 'value ' + (totalReturn >= 0 ? 'profit' : 'loss');
-  document.getElementById('s_trades').textContent = trades.length + '회';
-  document.getElementById('s_winrate').textContent = winRate.toFixed(1) + '%';
-  document.getElementById('s_winrate').className = 'value ' + (winRate >= 50 ? 'profit' : 'loss');
-  document.getElementById('s_mdd').textContent = '-' + mdd.toFixed(2) + '%';
-  document.getElementById('s_mdd').className = 'value loss';
-  document.getElementById('s_avgWin').textContent = '+' + avgWin.toFixed(2) + '%';
-  document.getElementById('s_avgWin').className = 'value profit';
-  document.getElementById('s_avgLoss').textContent = avgLoss.toFixed(2) + '%';
-  document.getElementById('s_avgLoss').className = 'value loss';
+  $('s_start').textContent=fmtB(S.capital);
+  $('s_end').textContent=fmtB(cash);$('s_end').className='vl '+(totalReturn>=0?'profit':'loss');
+  $('s_return').textContent=(totalReturn>=0?'+':'')+totalReturn.toFixed(2)+'%';$('s_return').className='vl '+(totalReturn>=0?'profit':'loss');
+  $('s_trades').textContent=trades.length+'회';
+  $('s_winrate').textContent=(winRate*100).toFixed(1)+'%';$('s_winrate').className='vl '+(winRate>=0.5?'profit':'loss');
+  $('s_mdd').textContent='-'+mdd.toFixed(2)+'%';$('s_mdd').className='vl loss';
+  $('s_sharpe').textContent=sharpe.toFixed(2);$('s_sharpe').className='vl '+(sharpe>=1?'profit':sharpe>=0?'neutral':'loss');
+  $('s_rr').textContent=rr.toFixed(2);$('s_rr').className='vl '+(rr>=2?'profit':rr>=1?'neutral':'loss');
+  $('s_kelly').textContent=(kelly*100).toFixed(1)+'%';$('s_kelly').className='vl '+(kelly>0?'profit':'loss');
+  $('s_kelly_sub').textContent=kelly>0?`최적 ${(kelly*100).toFixed(0)}% 베팅`:'베팅 불가';
+  $('s_maxLoss').textContent=maxConsLoss+'연패';$('s_maxLoss').className='vl loss';
+  $('s_maxWin').textContent=maxConsWin+'연승';$('s_maxWin').className='vl profit';
+  $('s_ruin').textContent=ruinProb.toFixed(1)+'%';$('s_ruin').className='vl '+(ruinProb<10?'profit':ruinProb<30?'neutral':'loss');
 
-  // 날짜 범위
-  const d0 = new Date(RAW_DATA[0].time), d1 = new Date(RAW_DATA[N-1].time);
-  document.getElementById('dateRange').textContent =
-    `📅 ${d0.getFullYear()}.${d0.getMonth()+1}.${d0.getDate()} ~ ${d1.getFullYear()}.${d1.getMonth()+1}.${d1.getDate()} (${N}일) · 실제 바이낸스 데이터`;
+  const d0=new Date(RAW_DATA[0].time),d1=new Date(RAW_DATA[N-1].time);
+  $('dateRange').textContent=`📅 ${d0.getFullYear()}.${d0.getMonth()+1}.${d0.getDate()} ~ ${d1.getFullYear()}.${d1.getMonth()+1}.${d1.getDate()} (${N}일) · BTC/USDT · 바이낸스`;
 
   // 거래 테이블
-  const tbody = document.getElementById('tradesBody');
-  tbody.innerHTML = trades.map(t => {
-    const dirLabel = t.dir || (t.type==='buy'?'매수':'매도');
-    const isEntry = dirLabel.includes('진입');
-    const tagClass = dirLabel.includes('롱') || t.type==='buy' ? 'buy-tag' : 'sell-tag';
-    const reasonStr = t.reason ? ` (${t.reason})` : '';
-    return `<tr>
-    <td>${t.date}</td>
-    <td><span class="${tagClass}">${dirLabel}${reasonStr}</span></td>
-    <td>$${fmt(Math.round(t.price))}</td>
-    <td>${t.position.toFixed(4)} BTC</td>
-    <td class="${t.pnl===null?'':(t.pnl>=0?'profit':'loss')}">${t.pnl===null?'-':(t.pnl>=0?'+':'')+fmtBil(t.pnl)+' ('+(t.pnlPct*100).toFixed(1)+'%)'}</td>
-    <td>${fmtBil(t.portfolio)}</td>
-  </tr>`;
+  $('tradesBody').innerHTML=trades.map(t=>{
+    const dl=t.dir||(t.type==='buy'?'매수':'매도');
+    const tc=dl.includes('롱')||t.type==='buy'?'bt':'st';
+    const rs=t.reason?` (${t.reason})`:'';
+    const pats=t.patterns?.length?t.patterns.join(', '):'—';
+    return `<tr><td>${t.date}</td><td><span class="${tc}">${dl}${rs}</span></td><td>$${fmt(Math.round(t.price))}</td><td>${t.pos.toFixed(4)}</td><td style="font-size:10px;color:#8b949e">${pats}</td><td class="${t.pnl===null?'':(t.pnl>=0?'profit':'loss')}">${t.pnl===null?'—':(t.pnl>=0?'+':'')+fmtB(t.pnl)+' ('+(t.pnlPct*100).toFixed(1)+'%)'}</td><td>${fmtB(t.portfolio)}</td></tr>`
   }).join('');
 
-  // ===== 차트 그리기 =====
-  Chart.defaults.color = '#8b949e';
-  Chart.defaults.borderColor = '#21262d';
+  // 몬테카를로 통계
+  $('mcStats').innerHTML=`
+    <div class="mc-stat"><div class="mc-l">시뮬 횟수</div><div class="mc-v blue">${S.mcRuns}</div></div>
+    <div class="mc-stat"><div class="mc-l">파산 확률</div><div class="mc-v ${ruinProb<10?'profit':'loss'}">${ruinProb.toFixed(1)}%</div></div>
+    <div class="mc-stat"><div class="mc-l">중앙값</div><div class="mc-v ${mcMedian>=S.capital?'profit':'loss'}">${fmtB(mcMedian)}</div></div>
+    <div class="mc-stat"><div class="mc-l">평균</div><div class="mc-v ${mcAvg>=S.capital?'profit':'loss'}">${fmtB(mcAvg)}</div></div>
+    <div class="mc-stat"><div class="mc-l">최고</div><div class="mc-v profit">${fmtB(mcBest)}</div></div>
+    <div class="mc-stat"><div class="mc-l">최저</div><div class="mc-v loss">${fmtB(mcWorst)}</div></div>`;
 
-  // 기존 차트 제거
-  Object.values(charts).forEach(c => c.destroy());
-  charts = {};
+  // 히트맵
+  const dayNames=['일','월','화','수','목','금','토'];
+  let hmHtml='<div class="heatmap">';
+  dayNames.forEach(d=>{hmHtml+=`<div class="hm-header">${d}</div>`});
+  dayNames.forEach((d,i)=>{
+    const vals=dayPnl[i];
+    const avg=vals.length?vals.reduce((s,v)=>s+v,0)/vals.length*100:0;
+    const cnt=vals.length;
+    const bg=avg>0?`rgba(63,185,80,${Math.min(Math.abs(avg)/10,0.6)})`:`rgba(248,81,73,${Math.min(Math.abs(avg)/10,0.6)})`;
+    hmHtml+=`<div class="hm-cell" style="background:${cnt?bg:'#161b22'}">${cnt?avg.toFixed(1)+'%':'—'}<br><span style="font-size:9px;color:#8b949e">${cnt}건</span></div>`
+  });
+  hmHtml+='</div>';
+  $('heatmapArea').innerHTML=hmHtml;
 
-  // 1. 가격 차트
-  charts.price = new Chart(document.getElementById('priceChart'), {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [
-        { label: 'BTC 가격', data: closes, borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,.08)', borderWidth: 2, fill: true, tension: .3, pointRadius: 0 },
-        { label: `EMA ${S.emaShort}`, data: emaS, borderColor: '#3fb950', borderWidth: 1.5, borderDash: [4,2], fill: false, tension: .3, pointRadius: 0 },
-        { label: `EMA ${S.emaLong}`, data: emaL, borderColor: '#f85149', borderWidth: 1.5, borderDash: [4,2], fill: false, tension: .3, pointRadius: 0 },
-        { label: '🟢 매수', data: buySignals, borderColor: '#3fb950', backgroundColor: '#3fb950', pointRadius: 10, pointStyle: 'triangle', showLine: false },
-        { label: '🔴 매도', data: sellSignals, borderColor: '#f85149', backgroundColor: '#f85149', pointRadius: 10, pointStyle: 'triangle', pointRotation: 180, showLine: false }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { position: 'top', labels: { usePointStyle: true, padding: 15, font: { size: 11 } } },
-        tooltip: { callbacks: { label: ctx => ctx.parsed.y !== null ? `${ctx.dataset.label}: $${fmt(Math.round(ctx.parsed.y))}` : null } }
-      },
-      scales: {
-        y: { grid: { color: '#21262d' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' } },
-        x: { grid: { color: '#1a1f29' } }
-      }
-    }
-  });
+  // ===== 차트 =====
+  Chart.defaults.color='#8b949e';Chart.defaults.borderColor='#21262d';
+  Object.values(charts).forEach(c=>c.destroy());charts={};
 
-  // 2. 포트폴리오 차트
-  charts.portfolio = new Chart(document.getElementById('portfolioChart'), {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [
-        { label: '포트폴리오', data: portfolioValues, borderColor: '#58a6ff', backgroundColor: 'rgba(88,166,255,.08)', borderWidth: 2.5, fill: true, tension: .3, pointRadius: 0 },
-        { label: '원금', data: new Array(N).fill(S.capital), borderColor: '#484f58', borderWidth: 1, borderDash: [6,3], fill: false, pointRadius: 0 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top', labels: { usePointStyle: true, padding: 15, font: { size: 11 } } },
-        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${fmtBil(ctx.parsed.y)}` } }
-      },
-      scales: {
-        y: { grid: { color: '#21262d' }, ticks: { callback: v => fmtBil(v) } },
-        x: { grid: { color: '#1a1f29' } }
-      }
-    }
-  });
+  const holdValues=closes.map(c=>S.capital*(c/closes[0]));
 
-  // 3. RSI 차트
-  charts.rsi = new Chart(document.getElementById('rsiChart'), {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{ label: `RSI (${S.rsiPeriod})`, data: rsi, borderColor: '#bc8cff', backgroundColor: 'rgba(188,140,255,.08)', borderWidth: 2, fill: true, tension: .3, pointRadius: 0 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top', labels: { usePointStyle: true, font: { size: 11 } } },
-        annotation: {
-          annotations: {
-            ob: { type: 'line', yMin: S.rsiOverbought, yMax: S.rsiOverbought, borderColor: 'rgba(248,81,73,.5)', borderWidth: 2, borderDash: [5,3],
-              label: { display: true, content: `과매수 (${S.rsiOverbought})`, position: 'end', color: '#f85149', backgroundColor: 'transparent', font: { size: 10 } } },
-            os: { type: 'line', yMin: S.rsiOversold, yMax: S.rsiOversold, borderColor: 'rgba(63,185,80,.5)', borderWidth: 2, borderDash: [5,3],
-              label: { display: true, content: `과매도 (${S.rsiOversold})`, position: 'end', color: '#3fb950', backgroundColor: 'transparent', font: { size: 10 } } },
-            obZ: { type: 'box', yMin: S.rsiOverbought, yMax: 100, backgroundColor: 'rgba(248,81,73,.04)', borderWidth: 0 },
-            osZ: { type: 'box', yMin: 0, yMax: S.rsiOversold, backgroundColor: 'rgba(63,185,80,.04)', borderWidth: 0 }
-          }
-        }
-      },
-      scales: { y: { min: 0, max: 100, grid: { color: '#21262d' } }, x: { grid: { color: '#1a1f29' } } }
-    }
-  });
+  // 1. 가격 차트 + BB
+  const priceSets=[
+    {label:'BTC',data:closes,borderColor:'#f7931a',backgroundColor:'rgba(247,147,26,.06)',borderWidth:2,fill:true,tension:.3,pointRadius:0,order:5},
+    {label:`EMA ${S.emaS}`,data:emaShort,borderColor:'#3fb950',borderWidth:1.5,borderDash:[4,2],fill:false,tension:.3,pointRadius:0,order:4},
+    {label:`EMA ${S.emaL}`,data:emaLong,borderColor:'#f85149',borderWidth:1.5,borderDash:[4,2],fill:false,tension:.3,pointRadius:0,order:4},
+    {label:'🟢 매수',data:buyS,borderColor:'#3fb950',backgroundColor:'#3fb950',pointRadius:9,pointStyle:'triangle',showLine:false,order:1},
+    {label:'🔴 매도',data:sellS,borderColor:'#f85149',backgroundColor:'#f85149',pointRadius:9,pointStyle:'triangle',pointRotation:180,showLine:false,order:1}
+  ];
+  if(S.useBB&&bb.upper){
+    priceSets.push({label:'BB 상단',data:bb.upper,borderColor:'rgba(88,166,255,.3)',borderWidth:1,fill:false,tension:.3,pointRadius:0,order:6});
+    priceSets.push({label:'BB 하단',data:bb.lower,borderColor:'rgba(88,166,255,.3)',borderWidth:1,fill:'-1',backgroundColor:'rgba(88,166,255,.04)',tension:.3,pointRadius:0,order:6});
+  }
+  charts.price=new Chart($('priceChart'),{type:'line',data:{labels,datasets:priceSets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:12,font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.parsed.y!==null?`${ctx.dataset.label}: $${fmt(Math.round(ctx.parsed.y))}`:null}}},scales:{y:{grid:{color:'#21262d'},ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'K'}},x:{grid:{color:'#1a1f29'}}}}});
 
-  // 4. 거래량 차트
-  const volColors = volumes.map((v, i) => {
-    if (volMA[i] && v > volMA[i] * S.volSpike) return 'rgba(247,147,26,.8)';
-    return closes[i] >= opens[i] ? 'rgba(63,185,80,.4)' : 'rgba(248,81,73,.4)';
+  // 2. 포트폴리오 + 피보나치
+  const fib=calcFib(pv);
+  const fibAnnotations={};
+  [0.236,0.382,0.5,0.618,0.786].forEach(lv=>{
+    fibAnnotations['fib_'+lv]={type:'line',yMin:fib[lv],yMax:fib[lv],borderColor:'rgba(188,140,255,.3)',borderWidth:1,borderDash:[4,3],
+      label:{display:true,content:`Fib ${(lv*100).toFixed(1)}%`,position:'start',color:'rgba(188,140,255,.6)',backgroundColor:'transparent',font:{size:9}}}
   });
-  charts.volume = new Chart(document.getElementById('volumeChart'), {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [
-        { label: '거래량', data: volumes, backgroundColor: volColors, borderWidth: 0 },
-        { label: `MA ${S.volMaPeriod}`, data: volMA, type: 'line', borderColor: '#58a6ff', borderWidth: 1.5, fill: false, pointRadius: 0, tension: .3 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', labels: { usePointStyle: true, font: { size: 11 } } } },
-      scales: {
-        y: { grid: { color: '#21262d' }, ticks: { callback: v => (v/1000).toFixed(0) + 'K' } },
-        x: { grid: { color: '#1a1f29' } }
-      }
-    }
-  });
+  charts.portfolio=new Chart($('portfolioChart'),{type:'line',data:{labels,datasets:[
+    {label:'포트폴리오',data:pv,borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,.06)',borderWidth:2.5,fill:true,tension:.3,pointRadius:0},
+    {label:'원금',data:new Array(N).fill(S.capital),borderColor:'#484f58',borderWidth:1,borderDash:[6,3],fill:false,pointRadius:0}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:10}}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmtB(ctx.parsed.y)}`}},annotation:{annotations:fibAnnotations}},scales:{y:{grid:{color:'#21262d'},ticks:{callback:v=>fmtB(v)}},x:{grid:{color:'#1a1f29'}}}}});
 
-  // 5. 비교 차트
-  charts.compare = new Chart(document.getElementById('compareChart'), {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [
-        { label: '워뇨띠 전략', data: portfolioValues, borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,.08)', borderWidth: 2.5, fill: true, tension: .3, pointRadius: 0 },
-        { label: '단순 홀딩', data: holdValues, borderColor: '#8b949e', backgroundColor: 'rgba(139,148,158,.05)', borderWidth: 2, borderDash: [5,3], fill: true, tension: .3, pointRadius: 0 },
-        { label: '원금', data: new Array(N).fill(S.capital), borderColor: '#484f58', borderWidth: 1, borderDash: [8,4], fill: false, pointRadius: 0 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top', labels: { usePointStyle: true, padding: 15, font: { size: 11 } } },
-        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${fmtBil(ctx.parsed.y)}` } }
-      },
-      scales: {
-        y: { grid: { color: '#21262d' }, ticks: { callback: v => fmtBil(v) } },
-        x: { grid: { color: '#1a1f29' } }
-      }
-    }
-  });
+  // 3. RSI
+  charts.rsi=new Chart($('rsiChart'),{type:'line',data:{labels,datasets:[{label:`RSI(${S.rsiP})`,data:rsi,borderColor:'#bc8cff',backgroundColor:'rgba(188,140,255,.06)',borderWidth:2,fill:true,tension:.3,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},annotation:{annotations:{ob:{type:'line',yMin:S.rsiOB,yMax:S.rsiOB,borderColor:'rgba(248,81,73,.4)',borderWidth:1.5,borderDash:[4,2]},os:{type:'line',yMin:S.rsiOS,yMax:S.rsiOS,borderColor:'rgba(63,185,80,.4)',borderWidth:1.5,borderDash:[4,2]},obZ:{type:'box',yMin:S.rsiOB,yMax:100,backgroundColor:'rgba(248,81,73,.03)',borderWidth:0},osZ:{type:'box',yMin:0,yMax:S.rsiOS,backgroundColor:'rgba(63,185,80,.03)',borderWidth:0}}}},scales:{y:{min:0,max:100,grid:{color:'#21262d'}},x:{grid:{color:'#1a1f29'}}}}});
+
+  // 4. MACD
+  if(S.useMACD&&macd.hist){
+    const hColors=macd.hist.map(v=>v>=0?'rgba(63,185,80,.6)':'rgba(248,81,73,.6)');
+    charts.macd=new Chart($('macdChart'),{type:'bar',data:{labels,datasets:[
+      {label:'히스토그램',data:macd.hist,backgroundColor:hColors,borderWidth:0,order:2},
+      {label:'MACD',data:macd.macd,type:'line',borderColor:'#58a6ff',borderWidth:1.5,fill:false,pointRadius:0,tension:.3,order:1},
+      {label:'Signal',data:macd.signal,type:'line',borderColor:'#f7931a',borderWidth:1.5,fill:false,pointRadius:0,tension:.3,order:1}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:10}}}},scales:{y:{grid:{color:'#21262d'}},x:{grid:{color:'#1a1f29'}}}}});
+  }
+
+  // 5. 거래량
+  const vColors=volumes.map((v,i)=>volMA[i]&&v>volMA[i]*S.volSpike?'rgba(247,147,26,.7)':closes[i]>=opens[i]?'rgba(63,185,80,.3)':'rgba(248,81,73,.3)');
+  charts.vol=new Chart($('volumeChart'),{type:'bar',data:{labels,datasets:[
+    {label:'거래량',data:volumes,backgroundColor:vColors,borderWidth:0},
+    {label:'MA20',data:volMA,type:'line',borderColor:'#58a6ff',borderWidth:1,fill:false,pointRadius:0,tension:.3}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#21262d'},ticks:{callback:v=>(v/1000).toFixed(0)+'K'}},x:{grid:{color:'#1a1f29'}}}}});
+
+  // 6. 비교 차트
+  charts.compare=new Chart($('compareChart'),{type:'line',data:{labels,datasets:[
+    {label:'워뇨띠 전략',data:pv,borderColor:'#f7931a',backgroundColor:'rgba(247,147,26,.06)',borderWidth:2.5,fill:true,tension:.3,pointRadius:0},
+    {label:'단순 홀딩',data:holdValues,borderColor:'#8b949e',backgroundColor:'rgba(139,148,158,.04)',borderWidth:2,borderDash:[5,3],fill:true,tension:.3,pointRadius:0},
+    {label:'원금',data:new Array(N).fill(S.capital),borderColor:'#484f58',borderWidth:1,borderDash:[8,4],fill:false,pointRadius:0}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:10}}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmtB(ctx.parsed.y)}`}}},scales:{y:{grid:{color:'#21262d'},ticks:{callback:v=>fmtB(v)}},x:{grid:{color:'#1a1f29'}}}}});
+
+  // 7. 몬테카를로 차트 (20개 샘플 곡선)
+  const mcSets=[];const sampleN=Math.min(20,S.mcRuns);
+  for(let i=0;i<sampleN;i++){
+    const idx=Math.floor(i*S.mcRuns/sampleN);
+    const curve=mcResults[idx].curve;
+    const mcLabels=curve.map((_,j)=>'T'+j);
+    mcSets.push({label:'',data:curve,borderColor:`hsla(${i*18},70%,60%,.3)`,borderWidth:1,fill:false,tension:.3,pointRadius:0});
+  }
+  const mcLabels=mcSets[0]?.data.map((_,j)=>'T'+j)||[];
+  charts.mc=new Chart($('mcChart'),{type:'line',data:{labels:mcLabels,datasets:mcSets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{y:{grid:{color:'#21262d'},ticks:{callback:v=>fmtB(v)}},x:{display:false}}}});
+
+  // 8. 수익 분포
+  const pnlPcts=closedTrades.map(t=>t.pnlPct*100);
+  const bins=new Array(20).fill(0);const binMin=-30,binMax=30,binW=(binMax-binMin)/20;
+  pnlPcts.forEach(v=>{const idx=Math.min(19,Math.max(0,Math.floor((v-binMin)/binW)));bins[idx]++});
+  const binLabels=bins.map((_,i)=>(binMin+i*binW).toFixed(0)+'%');
+  const binColors=bins.map((_,i)=>(binMin+i*binW+binW/2)>=0?'rgba(63,185,80,.5)':'rgba(248,81,73,.5)');
+  charts.dist=new Chart($('distChart'),{type:'bar',data:{labels:binLabels,datasets:[{label:'거래 분포',data:bins,backgroundColor:binColors,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#21262d'}},x:{grid:{color:'#1a1f29'}}}}});
 }
 
-// 초기 실행
-window.addEventListener('load', () => {
-  setTimeout(() => { runBacktest(); }, 200);
-});
+window.addEventListener('load',()=>setTimeout(runBacktest,200));
 </script>
-
 </body>
 </html>
